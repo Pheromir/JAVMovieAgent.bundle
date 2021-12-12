@@ -1,0 +1,8 @@
+[
+    { 
+        "id": "ImgProxyBaseUrl",
+        "label": "Imgproxy Base URL",
+        "type": "text",
+        "default": "https://localhost:8080/"
+    }
+]
