@@ -8,6 +8,7 @@ DIRECTURL="https://www.javlibrary.com/en/?v="
 xpath_title = "/html/body/div[3]/div[2]/div[1]/h3/a"
 xpath_javcode = "/html/body/div[3]/div[2]/table/tr/td[2]/div/div[1]/table/tr/td[2]"
 xpath_tags = "/html/body/div[3]/div[2]/table/tr/td[2]/div/div[8]/table/tr/td[2]"
+xpath_tags_no_rating = "/html/body/div[3]/div[2]/table/tr/td[2]/div/div[7]/table/tr/td[2]"
 xpath_actress = "/html/body/div[3]/div[2]/table/tr/td[2]/div/div[9]/table/tr/td[2]"
 xpath_studiolabel = "/html/body/div[3]/div[2]/table/tr/td[2]/div/div[6]/table/tr/td[2]/span/a"
 xpath_releasedate = "/html/body/div[3]/div[2]/table/tr/td[2]/div/div[2]/table/tr/td[2]"
@@ -43,8 +44,12 @@ def get_by_jav_id(jav_id, BASEURL=BASEURL):
         title = title.replace(word.lower(), replacement)
     args["title"] = title.title().strip()
     tags = []
-    for a in tree.xpath(xpath_tags)[0]:
-        tags.append(a[0].text.title())
+    try:
+        for a in tree.xpath(xpath_tags)[0]:
+            tags.append(a[0].text.title())
+    except AttributeError:
+        for a in tree.xpath(xpath_tags_no_rating)[0]:
+            tags.append(a[0].text.title())
     args["tags"] = tags
     if len(tree.xpath(xpath_studiolabel)) > 0:
         args["studio_label"] = tree.xpath(xpath_studiolabel)[0].text
