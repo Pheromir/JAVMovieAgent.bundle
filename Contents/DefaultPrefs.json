@@ -1,5 +1,11 @@
 [
     { 
+        "id": "UseImgProxy",
+        "label": "Use imgproxy to crop DVD cover",
+        "type": "bool",
+        "default": "True"
+    },
+    { 
         "id": "ImgProxyBaseUrl",
         "label": "Imgproxy Base URL",
         "type": "text",

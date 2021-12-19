@@ -29,5 +29,5 @@ Examples:
 
 ## Todo
 - Authorization Header support for imgproxy
-- Option to disable imgproxy cropping
-- Check dimensions of image to prevent cropping an image which might already be the front cover only
+- ~~Option to disable imgproxy cropping~~ done
+- ~~Check dimensions of image to prevent cropping an image which might already be the front cover only~~ done (might not work 100% yet)

@@ -1,14 +1,18 @@
 from datetime import datetime
 from difflib import SequenceMatcher
+import io
 import javhaven
 import r18
 import javland
 import javlibrary
+import imagesize
 
 IMGPROXY_BASEURL = Prefs["ImgProxyBaseUrl"]
+USE_IMGPROXY = Prefs["UseImgProxy"]
 if IMGPROXY_BASEURL[-1] is not "/":
     IMGPROXY_BASEURL = IMGPROXY_BASEURL + "/"
 IMGPROXY_OPTIONS = "resize:auto:0.47:0:0/crop:0.47:0:ea"
+IMGPROXY_OPTIONS_SQUARE = "resize:fit/width:[W]/height:[H]/ex:1/bg:46:46:46"
 
 def get_similarity(str1, str2):
     matcher = SequenceMatcher()
@@ -99,6 +103,7 @@ class JAVMovieAgent(Agent.Movies):
         results.Sort('score', descending=True)
         Log("Results for " + jav_id + ": " + str(results))
 
+
     def update(self, metadata, media, lang):
         Log("".ljust(157, '='))
         Log("update() - metadata.id: '%s', metadata.title: '%s'" % (metadata.id, metadata.title))
@@ -125,10 +130,25 @@ class JAVMovieAgent(Agent.Movies):
 
         
         metadata.title = "[" + vid.jav_code + "] " + vid.title
-        metadata.studio = vid.studio_label
-        metadata.genres = vid.tags
-        metadata.original_title = vid.jav_code
-        poster = HTTP.Request(IMGPROXY_BASEURL + IMGPROXY_OPTIONS + "/plain/" + vid.image_url, timeout=120, sleep=2.0).content
-        metadata.posters[vid.image_url] = Proxy.Media(poster)
+        if vid.studio_label is not None:
+            metadata.studio = vid.studio_label
+        if vid.tags is not None:
+            metadata.genres = vid.tags
+        if vid.jav_code is not None:
+            metadata.original_title = vid.jav_code
+
+        width, height = imagesize.get(io.BytesIO(HTTP.Request(vid.image_url, timeout=120).content))
+        Log("COVER IMAGE SIZE: " + str(width) + ", " + str(height))
+        if (1.55 > (width / height) > 1.4) and USE_IMGPROXY:
+            poster = HTTP.Request(IMGPROXY_BASEURL + IMGPROXY_OPTIONS + "/plain/" + vid.image_url, timeout=120, sleep=1.0).content
+            url_suffix = "1"
+        elif (width == height) and USE_IMGPROXY:
+            poster = HTTP.Request(IMGPROXY_BASEURL + IMGPROXY_OPTIONS_SQUARE.replace("[H]", str(int(height * 1.5))).replace("[W]", str(width)) + "/plain/" + vid.image_url, timeout=120, sleep=1.0).content
+            url_suffix = "2"
+        else:
+            poster = HTTP.Request(vid.image_url, timeout=120, sleep=1.0).content
+            url_suffix = "0"
+
+        metadata.posters[vid.image_url + "?v=" + url_suffix] = Proxy.Media(poster)
         metadata.originally_available_at = vid.release_date
         Log('update() ended')
