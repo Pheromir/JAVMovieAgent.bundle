@@ -138,14 +138,17 @@ class JAVMovieAgent(Agent.Movies):
             metadata.original_title = vid.jav_code
 
         width, height = imagesize.get(io.BytesIO(HTTP.Request(vid.image_url, timeout=120).content))
-        Log("COVER IMAGE SIZE: " + str(width) + ", " + str(height))
-        if (1.55 > (width / height) > 1.4) and USE_IMGPROXY:
+        Log("COVER IMAGE SIZE: " + str(width) + ", " + str(height) + " (" + str(float(width) / float(height)) + ")")
+        if (1.55 > (float(width) / float(height)) > 1.4) and USE_IMGPROXY:
+            Log("Potentially full DVD Cover, cropping..")
             poster = HTTP.Request(IMGPROXY_BASEURL + IMGPROXY_OPTIONS + "/plain/" + vid.image_url, timeout=120, sleep=1.0).content
             url_suffix = "1"
         elif (width == height) and USE_IMGPROXY:
+            Log("Square Image, resizing..")
             poster = HTTP.Request(IMGPROXY_BASEURL + IMGPROXY_OPTIONS_SQUARE.replace("[H]", str(int(height * 1.5))).replace("[W]", str(width)) + "/plain/" + vid.image_url, timeout=120, sleep=1.0).content
             url_suffix = "2"
         else:
+            Log("Unknown Format or imgproxy disabled..")
             poster = HTTP.Request(vid.image_url, timeout=120, sleep=1.0).content
             url_suffix = "0"
 
