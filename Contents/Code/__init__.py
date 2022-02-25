@@ -7,6 +7,7 @@ import javland
 import javlibrary
 import imagesize
 
+
 IMGPROXY_BASEURL = Prefs["ImgProxyBaseUrl"]
 USE_IMGPROXY = Prefs["UseImgProxy"]
 if IMGPROXY_BASEURL[-1] is not "/":
@@ -28,7 +29,7 @@ def Start():
 
 class JAVMovieAgent(Agent.Movies):
     name, primary_provider, fallback_agent, contributes_to, languages, accepts_from = (
-        'JAVMovie', True, False, None, [Locale.Language.English], ['com.plexapp.agents.localmedia'])
+    'JAVMovie', True, False, None, [Locale.Language.English], ['com.plexapp.agents.localmedia'])
 
     def search(self, results, media, lang, manual=False):
         Log("".ljust(157, '-'))
@@ -128,8 +129,13 @@ class JAVMovieAgent(Agent.Movies):
             Log("Cant match metadata.id " + metadata.id)
             return
 
-        
-        metadata.title = "[" + vid.jav_code + "] " + vid.title
+        # Check if movie is uncensored (contains "[u]" or "[uncen")
+        filename = media.items[0].parts[0].file.split("/")[-1].lower()
+        if "[u]" in filename or "[uncen" in filename:
+            metadata.title = "[" + vid.jav_code + "][U]" + vid.title
+        else:
+            metadata.title = "[" + vid.jav_code + "] " + vid.title
+            
         if vid.studio_label is not None:
             metadata.studio = vid.studio_label
         if vid.tags is not None:
