@@ -30,15 +30,16 @@ def get_by_content_id(content_id):
         title = title.replace(word.lower(), replacement)
     args["title"] = title.title().strip()
     tags = []
-    for tag in json_response["data"]["categories"]:
-        tagtemp = tag["name"]
-        to_remove = ["Featured Actress", "Hi-Def", "2021 Winter Sale", "Sale (limited time)", "Digital Mosaic", "AV OPEN 2017 Y********l Category"]
-        if tagtemp in to_remove:
-            continue
-        for word, replacement in censored_words.items():
-            tagtemp = tagtemp.lower().replace(word.lower(), replacement)
-        tags.append(tagtemp.title())
-    args["tags"] = tags
+    if json_response["data"]["categories"] is not None:
+        for tag in json_response["data"]["categories"]:
+            tagtemp = tag["name"]
+            to_remove = ["Featured Actress", "Hi-Def", "2021 Winter Sale", "Sale (limited time)", "Digital Mosaic", "AV OPEN 2017 Y********l Category"]
+            if tagtemp in to_remove:
+                continue
+            for word, replacement in censored_words.items():
+                tagtemp = tagtemp.lower().replace(word.lower(), replacement)
+            tags.append(tagtemp.title())
+        args["tags"] = tags
     if json_response["data"]["maker"] is not None and json_response["data"]["maker"]["name"] is not None:
         args["studio_label"] = json_response["data"]["maker"]["name"]
     else:
@@ -59,7 +60,7 @@ def __str__(self):
 
 def get_search_results(keyword):
     try:
-        html = HTTP.Request(SEARCH_URL + keyword).content
+        html = HTTP.Request(SEARCH_URL + keyword + "/").content
     except Exception as e:
         raise e
     tree = etree.HTML(html)
