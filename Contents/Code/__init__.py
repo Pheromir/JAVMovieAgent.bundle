@@ -45,15 +45,15 @@ class JAVMovieAgent(Agent.Movies):
         Log("Fetching infos for " + media.name + "('" + jav_id + "')")
 
         ######### R18.com ##########
-        results_found = r18.get_search_results(jav_id)
-        for vid in results_found:
-            results.Append(MetadataSearchResult(
-                id = "0" + vid.content_id,
-                name = "[" + vid.jav_code + "] " + "[R18] " + vid.title,
-                year = vid.release_date,
-                lang = 'en',
-                score = get_similarity(jav_id.lower(), vid.jav_code.lower())
-            ))
+        # results_found = r18.get_search_results(jav_id)
+        # for vid in results_found:
+        #     results.Append(MetadataSearchResult(
+        #         id = "0" + vid.content_id,
+        #         name = "[" + vid.jav_code + "] " + "[R18] " + vid.title,
+        #         year = vid.release_date,
+        #         lang = 'en',
+        #         score = get_similarity(jav_id.lower(), vid.jav_code.lower())
+        #     ))
         ############################
 
         ####### JavHaven.com #######
