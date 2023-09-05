@@ -32,7 +32,7 @@ def get_by_jav_id(jav_id):
     args["studio_label"] = tree.xpath(xpath_studiolabel)[0].text
     date = tree.xpath(xpath_releasedate)[0].text
     if date is None:
-        args["release_date"] = None
+        args["release_date"] = datetime.datetime(1900, 1, 1, 00, 00) # placeholder date
     else:
         args["release_date"] = datetime.datetime.strptime(date, releasedate_format)
     args["image_url"] = tree.xpath(xpath_image)[0].attrib["src"]

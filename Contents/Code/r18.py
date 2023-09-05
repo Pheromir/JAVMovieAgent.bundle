@@ -46,7 +46,7 @@ def get_by_content_id(content_id):
         args["studio_label"] = None
     date = json_response["data"]["release_date"]
     if date is None:
-        args["release_date"] = None
+        args["release_date"] = datetime.datetime(1900, 1, 1, 00, 00) # placeholder date
     else:
         args["release_date"] = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
     args["image_url"] = json_response["data"]["images"]["jacket_image"]["large"]

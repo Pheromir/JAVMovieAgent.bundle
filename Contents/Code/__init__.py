@@ -6,6 +6,7 @@ import r18
 import javland
 import javlibrary
 import imagesize
+import operator
 
 
 IMGPROXY_BASEURL = Prefs["ImgProxyBaseUrl"]
@@ -42,7 +43,7 @@ class JAVMovieAgent(Agent.Movies):
                 index += 1
             jav_id = jav_id[:index] + "-" + jav_id[index:]
 
-        Log("Fetching infos for " + media.name + "('" + jav_id + "')")
+        Log("Fetching infos for " + media.name + " ('" + jav_id + "')")
 
         ######### R18.com ##########
         # results_found = r18.get_search_results(jav_id)
@@ -61,7 +62,7 @@ class JAVMovieAgent(Agent.Movies):
         if vid is not None:
             results.Append(MetadataSearchResult(
                 id = "1" + vid.jav_code,
-                name = "[" + vid.jav_code + "] " + "[JavHaven] " + vid.title,
+                name = "[" + vid.jav_code + "]" + "[JavHaven]" + "[" + vid.release_date.strftime("%d.%m.%Y") + "] " + vid.title,
                 year = vid.release_date,
                 lang = 'en',
                 score = get_similarity(jav_id.lower(), vid.jav_code.lower())
@@ -73,7 +74,7 @@ class JAVMovieAgent(Agent.Movies):
         if vid is not None:
             results.Append(MetadataSearchResult(
                 id = "2" + vid.jav_code,
-                name = "[" + vid.jav_code + "] " + "[JavLand] " +vid.title,
+                name = "[" + vid.jav_code + "]" + "[JavLand]" + "[" + vid.release_date.strftime("%d.%m.%Y") + "] "  + vid.title,
                 year = vid.release_date,
                 lang = 'en',
                 score = get_similarity(jav_id.lower(), vid.jav_code.lower())
@@ -81,27 +82,19 @@ class JAVMovieAgent(Agent.Movies):
         ############################
 
         ####### JavLibrary.com ########
-        vid = javlibrary.get_by_jav_id(jav_id)
-        if isinstance(vid, list):
-            for vid in results_found:
+        vids = javlibrary.get_by_jav_id(jav_id)
+        if isinstance(vids, list):
+            for vid in vids:
                 results.Append(MetadataSearchResult(
-                    id = "3" + vid.content_id,
-                    name = "[" + vid.jav_code + "] " + "[JavLib] " + vid.title,
+                    id = "3" + vid.jav_code,
+                    name = "[" + vid.jav_code + "]" + "[JavLib]" + "[" + vid.release_date.strftime("%d.%m.%Y") + "] "  + vid.title,
                     year = vid.release_date,
                     lang = 'en',
                     score = get_similarity(jav_id.lower(), vid.jav_code.lower())
                 ))
-        elif vid is not None:
-            results.Append(MetadataSearchResult(
-                id = "3" + vid.jav_code,
-                name = "[" + vid.jav_code + "] " + "[JavLib] " +vid.title,
-                year = vid.release_date,
-                lang = 'en',
-                score = get_similarity(jav_id.lower(), vid.jav_code.lower())
-            ))
         ############################
 
-        results.Sort('score', descending=True)
+        results = sorted(results, key=operator.attrgetter('score', 'year'))
         Log("Results for " + jav_id + ": " + str(results))
 
 
@@ -124,7 +117,7 @@ class JAVMovieAgent(Agent.Movies):
             
         elif metadata.id[0] == "3":  # Metadata from javland.com
             Log(metadata.id + " Metadata from javlibrary.com (" + metadata.id[1:] + ")")
-            vid = javlibrary.get_by_jav_id(metadata.id[1:])
+            vid = javlibrary.get_by_jav_id(metadata.id[1:])[0]
         else:
             Log("Cant match metadata.id " + metadata.id)
             return

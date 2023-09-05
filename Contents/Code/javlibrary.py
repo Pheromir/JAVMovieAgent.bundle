@@ -28,16 +28,20 @@ def get_by_jav_id(jav_id, BASEURL=BASEURL):
         return None
     tree = etree.HTML(html)
     args = {}
+
     if len(tree.xpath(xpath_notfound)) > 0 and "Search returned no result." in tree.xpath(xpath_notfound)[0].text:
         return None
+    
     if BASEURL != DIRECTURL and len(tree.xpath(xpath_multiple_found)) > 0 and tree.xpath(xpath_multiple_found)[0].text is not None:
         if "ID Search Result" in tree.xpath(xpath_multiple_found)[0].text:
             if len(tree.xpath(xpath_multiple_list)[0]) > 0:
                 results = []
                 for videolink in tree.xpath(xpath_multiple_list)[0]:
                     vid = get_by_jav_id(videolink[0].attrib["href"].replace("./?v=", ""), DIRECTURL)
-                    results.append(vid)
+                    results.append(vid[0])
                 return results
+            
+
     args["jav_code"] = tree.xpath(xpath_javcode)[0].text
     title = str(tree.xpath(xpath_title)[0].text).replace("[" + args["jav_code"] + "]", "").replace(args["jav_code"], "").lower()
     for word, replacement in censored_words.items():
@@ -55,10 +59,10 @@ def get_by_jav_id(jav_id, BASEURL=BASEURL):
         args["studio_label"] = tree.xpath(xpath_studiolabel)[0].text
     date = tree.xpath(xpath_releasedate)[0].text
     if date is None:
-        args["release_date"] = None
+        args["release_date"] = datetime.datetime(1900, 1, 1, 00, 00) # placeholder date
     else:
         args["release_date"] = datetime.datetime.strptime(date, releasedate_format)
     args["image_url"] = ("https:" + tree.xpath(xpath_image)[0].attrib["src"]) if tree.xpath(xpath_image)[0].attrib["src"].startswith("//") else tree.xpath(xpath_image)[0].attrib["src"]
 
 
-    return javmovie.JAVMovie(args)
+    return [javmovie.JAVMovie(args)]
