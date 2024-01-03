@@ -5,7 +5,7 @@ This Plugin requires access to an [imgproxy](https://github.com/imgproxy/imgprox
 Please don't expect too much of this plugin, it might be full of bugs and throw some errors.
 
 ## Supported Sites
-- R18.com
+- ~~R18.com~~
 - JavLibrary.com
 - Jav.land
 - JavHaven.com
